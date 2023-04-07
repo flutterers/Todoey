@@ -7,11 +7,13 @@ class ToDoListTileItem extends StatelessWidget {
     required this.taskName,
     required this.isChecked,
     required this.checkBoxCallback,
+    required this.isLongPressedCallback,
   }) : super(key: key);
 
   final String taskName;
-  final VoidCallback checkBoxCallback;
   final bool isChecked;
+  final VoidCallback checkBoxCallback;
+  final VoidCallback isLongPressedCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class ToDoListTileItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: ListTile(
+        onLongPress: () => isLongPressedCallback(),
         leading: Text(
           taskName,
           style: TextStyle(
@@ -42,9 +45,7 @@ class ToDoListTileItem extends StatelessWidget {
         ),
         trailing: Checkbox(
           value: isChecked,
-          onChanged: (newValue) {
-            checkBoxCallback();
-          },
+          onChanged: (newValue) => checkBoxCallback(),
           fillColor: MaterialStateProperty.resolveWith(getColor),
           checkColor: Colors.white,
         ),

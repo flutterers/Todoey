@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:todoey/models/tasks_list.dart';
 import 'package:todoey/constants.dart';
 
 class AddTaskBottomSheet extends StatelessWidget {
@@ -57,7 +59,9 @@ class AddTaskBottomSheet extends StatelessWidget {
               ),
               ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context, typedTask);
+                    Provider.of<TasksList>(context, listen: false)
+                        .addTask(typedTask);
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: kBackgroundColor),

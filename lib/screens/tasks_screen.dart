@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todoey/components/add_task_bottom_sheet.dart';
 import 'package:todoey/constants.dart';
 
+import '../models/tasks_list.dart';
 import '../components/todo_list_tile_item.dart';
-import '../models/task.dart';
 
-class TasksScreen extends StatefulWidget {
+class TasksScreen extends StatelessWidget {
   const TasksScreen({Key? key}) : super(key: key);
-
-  @override
-  State<TasksScreen> createState() => _TasksScreenState();
-}
-
-class _TasksScreenState extends State<TasksScreen> {
-  dynamic addedTask = "";
-  List<Task> tasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +17,8 @@ class _TasksScreenState extends State<TasksScreen> {
         height: 80,
         width: 60,
         child: FloatingActionButton(
-          onPressed: () async {
-            addedTask = await showModalBottomSheet(
+          onPressed: () {
+            showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 builder: (context) => SingleChildScrollView(
@@ -34,9 +27,6 @@ class _TasksScreenState extends State<TasksScreen> {
                           bottom: MediaQuery.of(context).viewInsets.bottom),
                       child: const AddTaskBottomSheet(),
                     )));
-            setState(() {
-              tasks.add(Task(name: addedTask));
-            });
           },
           backgroundColor: kBackgroundColor,
           child: const Icon(
@@ -74,7 +64,7 @@ class _TasksScreenState extends State<TasksScreen> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    "${tasks.length} Tasks",
+                    "${Provider.of<TasksList>(context).tasksCount} Tasks",
                     style: kSubTitleStyle,
                   ),
                 )
@@ -88,16 +78,19 @@ class _TasksScreenState extends State<TasksScreen> {
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30))),
-              child: ListView.builder(
-                itemCount: tasks.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ToDoListTileItem(
-                    taskName: tasks[index].name,
-                    isChecked: tasks[index].isDone,
-                    checkBoxCallback: () {
-                      setState(() {
-                        tasks[index].toggleCheck();
-                      });
+              child: Consumer<TasksList>(
+                builder: (context, tasksListData, child) {
+                  return ListView.builder(
+                    itemCount: tasksListData.tasksCount,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ToDoListTileItem(
+                        taskName: tasksListData.getTaskName(index),
+                        isChecked: tasksListData.getTaskState(index),
+                        checkBoxCallback: () =>
+                            tasksListData.toggleTaskState(index),
+                        isLongPressedCallback: () =>
+                            tasksListData.deleteTask(index),
+                      );
                     },
                   );
                 },
